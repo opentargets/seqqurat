@@ -5,6 +5,8 @@ Tool for extracting seq-was from GWAS Catalog
 
 ## Run seqqurat
 
+To extract the seqwas study accessions from GWAS Catalog do following procedure
+
 1. Build the study database
 
 ```{bash}
@@ -13,13 +15,16 @@ DB_PATH=gwas.db
 wget https://www.ebi.ac.uk/gwas/api/search/downloads/studies/v1.0.3.1
 uv sync --frozen
 # Build the database
-uv run seqqurat study-index tests/data/gwas-catalog-v1.0.3.1-studies-r2025-03-08.tsv $DB_PATH
+uv run seqqurat study-index v1.0.3.1 $DB_PATH
 ```
 
-2. Extract the seq-was studies
+Now you can query the `study_index` table using `duckdb cli` 
+
+2. Extract the seq-was studies to the parquet file
 ```{bash}
-uv run seqqurat extract-seq-was $DB_PATH
+uv run seqqurat extract-seqwas $DB_PATH --output-path seqwas.parquet
 ```
+
 
 > [!TIP]
 > Currently we support only `v1.0.3.1` version schema of the GWAS Catalog study index.
