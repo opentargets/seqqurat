@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "Seqqurat"
+      "rtype",
+      "Seqqurat"
     ],
     "python.analysis.typeCheckingMode": "standard",
     "[python]": {
@@ -11,4 +12,5 @@
       "source.fixAll": "never",
       "source.organizeImports": "explicit"
     }
+  }
 }

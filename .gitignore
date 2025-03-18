@@ -4,7 +4,10 @@
 .venv
 
 
-file.db
+gwas.db
 tests/data/*
 
 __pycache__
+
+dist/
+build/

@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import duckdb as duck
 from loguru import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class Store:
@@ -24,8 +28,8 @@ class Store:
         """Wether the connection to the database was done."""
         return False
 
-    def execute(self, query: str | list[str] | duck.Statement | list[duck.Statement]):
-        """Execute statements."""
+    def execute(self, query: str | Sequence[str] | duck.Statement | Sequence[duck.Statement]):
+        """Execute queries or statements."""
         with duck.connect(self.location) as conn:
             # print(query)
             match query:
@@ -42,5 +46,5 @@ class Store:
 
     @classmethod
     def build(cls, location: Path) -> Store:
-        """Build the store."""
+        """Build the database in the provided location."""
         raise NotImplementedError('implement in child classes')

@@ -28,7 +28,7 @@ CREATE OR REPLACE TABLE  study_index (
 
 BEGIN TRANSACTION;
 COPY study_index 
-FROM 'tests/data/gwas-catalog-v1.0.3.1-studies-r2025-03-08.tsv' 
+FROM '{study_file}'
     (DELIMITER '\t', HEADER false, SKIP 1);
 
 COMMIT;

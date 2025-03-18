@@ -16,12 +16,25 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 
-def read_sql_statements(file: Path) -> Result[Sequence[Statement], SeqquratError]:
-    """Read sql statements from file."""
+def read_sql_statements(file: Path, env: dict[str, str]) -> Result[Sequence[Statement], SeqquratError]:
+    """Read sql statement and map the environment variables to the templates.
+
+    :param file: Path to the template.
+    :type file: Path
+    :param env: Environment variables to process the template query.
+    :type env: dict[str, str]
+    :return: Enum of either duckdb statement sequence of error.
+    :rtype: Result[Sequence[Statement], SeqquratError]
+    """
     with open(file) as f:
         queries = f.read()
+        for k, v in env.items():
+            key_replacement = '{%s}' % k  # noqa: UP031
+            queries = queries.replace(key_replacement, v)
+        print(queries)  # noqa: T201
     try:
-        return Success(extract_statements(query=queries))
+        statements = extract_statements(query=queries)
+        return Success(statements)
 
     except ParserException:
         return Failure(SeqquratError.QUERY_FILE_PARSING_ERROR)
@@ -30,12 +43,16 @@ def read_sql_statements(file: Path) -> Result[Sequence[Statement], SeqquratError
 class QueryResolver:
     """Object used to get the queries defined in the seqqurat package metadata."""
 
-    def __init__(self) -> None:
-        """Class to store all queries defined in the project."""
+    def __init__(self, env: dict[str, str]) -> None:
+        """Class to store all queries defined in the project.
+
+        :param env: Environment variables to process the template query.
+        :type env: dict[str, str]
+        """
         query_files = (Path(str(f)) for f in files('seqqurat.sql').iterdir())
         query_files = (p for p in query_files if p.is_file() and p.suffix == '.sql')
         # can call unwrap with no error, since all queries defined in the package should be parsable!
-        self.queries = {p.name.removesuffix('.sql'): read_sql_statements(p).unwrap() for p in query_files}
+        self.queries = {p.name.removesuffix('.sql'): read_sql_statements(p, env).unwrap() for p in query_files}
 
     def get(self, query_name: SeqquratQueryName) -> Result[Sequence[Statement], SeqquratError]:
         """Get the statements for the sql query."""

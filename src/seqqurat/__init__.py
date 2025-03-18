@@ -9,13 +9,13 @@ from loguru import logger
 from seqqurat.extractor import GWASCatalogStudyStore
 from seqqurat.query_parser import QueryResolver, SeqquratQueryName
 
-DB_FILE = Path('~/.config/gwas-extractor/file.db')
+DB_FILE = Path('gwas.db')
 
 cli = typer.Typer(no_args_is_help=True)
 
 
 @cli.command()
-def build_meta_database(
+def study_index(
     study_file: Annotated[
         Path, typer.Argument(help='Path to the original data to use to build the study metadata database.')
     ],
@@ -26,7 +26,7 @@ def build_meta_database(
     logger.info(
         f'Using study file from {study_file}',
     )
-    qr = QueryResolver()
+    qr = QueryResolver(env={'study_file': str(study_file)})
     statements = qr.get(SeqquratQueryName.CREATE_STUDY_TABLE).unwrap()
     db = GWASCatalogStudyStore.build(location=db_path)
     logger.info('Executing')

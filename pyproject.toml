@@ -32,7 +32,7 @@ test = [
 ]
 
 [project.scripts]
-hello = "seqqurat:cli"
+seqqurat = "seqqurat:cli"
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
