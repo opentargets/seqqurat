@@ -1,3 +1,4 @@
+-- Build the study_index table from GWAS Catalog study index.
 CREATE OR REPLACE TABLE  study_index (
     dateAddedToCatalog DATE,
     pubmedId UINTEGER,
