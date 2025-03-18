@@ -1,0 +1,10 @@
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.venv
+
+
+file.db
+tests/data/*
+
+__pycache__
