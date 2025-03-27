@@ -2,12 +2,10 @@
 
 BEGIN TRANSACTION;
 CREATE OR REPLACE VIEW seqwas_study_index  AS 
-SELECT 
-    studyAccession, 
-    genotypingTechnology 
+SELECT * 
 FROM 
     study_index 
-WHERE genotypingTechnology NOT ILIKE '%array%';
+WHERE genotypingTechnology NOT ILIKE '%array%' AND fullSummaryStatistics;
 COMMIT;
 
 SELECT * FROM seqwas_study_index;

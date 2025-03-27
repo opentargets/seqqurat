@@ -37,7 +37,8 @@ def read_sql_statements(file: Path, env: dict[str, str]) -> Result[Sequence[Stat
         statements = extract_statements(query=queries)
         return Success(statements)
 
-    except ParserException:
+    except ParserException as e:
+        logger.error(e)
         return Failure(SeqquratError.QUERY_FILE_PARSING_ERROR)
 
 
