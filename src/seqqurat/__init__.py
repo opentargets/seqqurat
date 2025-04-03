@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
-from duckdb import IOException
 from loguru import logger
 from returns.result import Success
 
@@ -13,12 +12,13 @@ from seqqurat.open_targets import OpenTargetOutputDataset, SubdirectoryValidator
 from seqqurat.query_parser import QueryResolver, SeqquratQueryName
 
 DB_FILE = Path('gwas.db')
+OT_DB_FILE = Path('ot.db')
 
 cli = typer.Typer(no_args_is_help=True)
 
 
 def db_callback(value: Path):
-    """Callback to validate the database existance."""
+    """Callback to validate the database existence."""
     return value
 
 
@@ -82,8 +82,8 @@ def build_ot_db(
     ],
     db_path: Annotated[
         Path,
-        typer.Option(help='Path to the parquet output db file', callback=db_callback),
-    ] = DB_FILE,
+        typer.Argument(help='Path to the parquet output db file', callback=db_callback),
+    ] = OT_DB_FILE,
 ):
     """Build OpenTargets duckdb database."""
     logger.info('Extracting information from output dataset.')
@@ -95,8 +95,8 @@ def build_ot_db(
             for d in _directories:
                 env = {'output_dataset_path': str(d) + '/*.parquet', 'table_name': d.stem}
                 logger.info(f'Using {env} to build {env["output_dataset_path"]}')
+                # Evidence table is a special case, since it is hive partitioned table.
                 if d.stem == 'evidence':
-                    logger.error(env)
                     env['output_dataset_path'] = str(d) + '/*/*.parquet'
                     statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_HIVE_TABLE).unwrap()
                 else:
