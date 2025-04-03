@@ -97,11 +97,8 @@ def build_ot_db(
                 logger.info(f'Using {env} to build {env["output_dataset_path"]}')
                 if d.stem == 'evidence':
                     logger.error(env)
-                statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
-                try:
-                    db.execute(statements)
-                except IOException:
-                    env['output_dataset_path'] = str(d) + '/*'
-                    if d.stem == 'evidence':
-                        logger.error(env)
+                    env['output_dataset_path'] = str(d) + '/*/*.parquet'
                     statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_HIVE_TABLE).unwrap()
+                else:
+                    statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
+                db.execute(statements)
