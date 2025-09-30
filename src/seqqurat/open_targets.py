@@ -33,7 +33,7 @@ class OpenTargetOutputDataset(StrEnum):
     GO = 'go'
     INTERACTION = 'interaction'
     INTERACTION_EVIDENCE = 'interaction_evidence'
-    INTERVAL = 'intervals'
+    INTERVAL = 'interval'
     KNOWN_DRUG = 'known_drug'
     L2G_PREDICTION = 'l2g_prediction'
     LITERATURE = 'literature'
