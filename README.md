@@ -18,11 +18,13 @@ To build the local sql database with duckdb and open targets outputs data follow
 rsync -rpltvz --delete rsync.ebi.ac.uk::pub/databases/opentargets/platform/25.03/output .
 # Load the datasets
 uv sync
-uv run seqqurat build-ot-db --output-datasets-path output ot.db
+uv run seqqurat build-ot-db --output-datasets-path output --release 25.03 ot.db 
 ```
 
 The above command will load all output datasets to the duckdb local database under
 the `ot.db` file. The loading of full 25.03 downloads should take ~6minutes on 16G memory machine with 8 cores (tested on Mac M1). The size of the database is ~26GB for 25.03 release.
+
+Note that if you do not provide the `--release`, then the provided directory will be scanned for available releases and the first one that supports the available datasets will be used.
 
 To view the database locally you must install the duckdb cli client. If it is installed view the database with
 
@@ -37,6 +39,14 @@ duckdb -ui ot.db
 ```
 
 Now you can explore the Open Targets output data in your browser SQL client!
+
+### Supported OT releases
+
+- 25.03
+- 25.06
+- 25.09
+- 25.12
+
 
 ### Exome sequencing analysis
 

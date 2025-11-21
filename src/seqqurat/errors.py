@@ -12,3 +12,4 @@ class SeqquratError(StrEnum):
 
     # validation errors
     OUTPUT_DIR_VALIDATION_ERROR = 'Data output dir does not match expected schema.'
+    MISSING_RELEASE_SCHEMA = 'No schema found for the specified release.'

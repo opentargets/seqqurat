@@ -9,7 +9,8 @@ license = { text = "Apache-2.0" }
 dependencies = [
     "duckdb>=1.2.1",
     "loguru>=0.7.3",
-    "polars>=1.25.2",
+    "pydantic>=2.12.4",
+    "pyyaml>=6.0.3",
     "returns>=0.24.0",
     "typer>=0.15.2",
 ]
@@ -24,7 +25,11 @@ packages = ["src/seqqurat"]
 [dependency-groups]
 dev = [
     "deptry>=0.23.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.7",
+    "pandas>=2.3.3",
     "ruff>=0.11.0",
+    "seaborn>=0.13.2",
 ]
 test = [
     "coverage>=7.7.0",

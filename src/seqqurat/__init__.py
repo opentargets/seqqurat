@@ -1,5 +1,6 @@
 """Seqqurat library."""
 
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -8,7 +9,7 @@ from loguru import logger
 from returns.result import Success
 
 from seqqurat.extractor import GWASCatalogStudyStore
-from seqqurat.open_targets import OpenTargetOutputDataset, SubdirectoryValidator
+from seqqurat.open_targets import OpenTargetsDatasetSchemaRegistry
 from seqqurat.query_parser import QueryResolver, SeqquratQueryName
 
 DB_FILE = Path('gwas.db')
@@ -84,14 +85,17 @@ def build_ot_db(
         Path,
         typer.Argument(help='Path to the parquet output db file', callback=db_callback),
     ] = OT_DB_FILE,
+    release: Annotated[str, typer.Option(help='OpenTargets release version to validate against.')] | None = None,
 ):
     """Build OpenTargets duckdb database."""
     logger.info('Extracting information from output dataset.')
-    all_possible_paths = {output_datasets_path / ds.value for ds in OpenTargetOutputDataset}
-    directories = SubdirectoryValidator(output_datasets_path).validate(all_possible_paths)
-    match directories:
-        case Success(_directories):
+    schema_registry = OpenTargetsDatasetSchemaRegistry(directory=output_datasets_path)
+    model = schema_registry.validate(release=release)
+    match model:
+        case Success(_model):
             db = GWASCatalogStudyStore.build(location=db_path)
+            logger.info(f'Using validated model for release: {_model.release}')
+            _directories = _model.datasets
             for d in _directories:
                 env = {'output_dataset_path': str(d) + '/*.parquet', 'table_name': d.stem}
                 logger.info(f'Using {env} to build {env["output_dataset_path"]}')
@@ -102,3 +106,7 @@ def build_ot_db(
                 else:
                     statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
                 db.execute(statements)
+
+        case _:
+            logger.debug('No valid OpenTargets dataset structure found.')
+            sys.exit(1)

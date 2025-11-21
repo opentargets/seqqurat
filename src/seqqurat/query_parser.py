@@ -29,7 +29,6 @@ def read_sql_statements(file: Path, env: dict[str, str]) -> Result[Sequence[Stat
     """
     with open(file) as f:
         queries = f.read()
-        logger.debug(f'Replacing {env}')
         for k, v in env.items():
             key_replacement = '{%s}' % k  # noqa: UP031
             queries = queries.replace(key_replacement, v)
