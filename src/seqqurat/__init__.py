@@ -1,6 +1,7 @@
 """Seqqurat library."""
 
 import sys
+from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
 
@@ -11,6 +12,14 @@ from returns.result import Success
 from seqqurat.extractor import GWASCatalogStudyStore
 from seqqurat.open_targets import OpenTargetsDatasetSchemaRegistry
 from seqqurat.query_parser import QueryResolver, SeqquratQueryName
+
+
+class View(StrEnum):
+    """Enum for different queries."""
+
+    THERAPEUTIC_AREAS = 'therapeutic_areas'
+    OTHER = 'other'
+
 
 DB_FILE = Path('gwas.db')
 OT_DB_FILE = Path('ot.db')
@@ -86,9 +95,16 @@ def build_ot_db(
         typer.Argument(help='Path to the parquet output db file', callback=db_callback),
     ] = OT_DB_FILE,
     release: Annotated[str, typer.Option(help='OpenTargets release version to validate against.')] | None = None,
+    view: Annotated[list[View] | None, typer.Option(help='Views to include in the database.')] = None,
+    dry_run: Annotated[bool, typer.Option(help='If set, will not build the database.')] = False,
 ):
     """Build OpenTargets duckdb database."""
     logger.info('Extracting information from output dataset.')
+    if view:
+        logger.info(f'Including views: {view}')
+    if dry_run:
+        logger.info('Dry run set, exiting now.')
+        sys.exit(0)
     schema_registry = OpenTargetsDatasetSchemaRegistry(directory=output_datasets_path)
     model = schema_registry.validate(release=release)
     match model:
@@ -106,7 +122,14 @@ def build_ot_db(
                 else:
                     statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
                 db.execute(statements)
+            if view:
+                for v in view:
+                    if v == View.THERAPEUTIC_AREAS:
+                        logger.info('Adding therapeutic areas view.')
+                        statements = QueryResolver().get(SeqquratQueryName.THERAPEUTIC_AREAS).unwrap()
+                        db.execute(statements)
 
         case _:
             logger.debug('No valid OpenTargets dataset structure found.')
+
             sys.exit(1)
