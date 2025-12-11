@@ -115,13 +115,15 @@ def build_ot_db(
             for d in _directories:
                 env = {'output_dataset_path': str(d) + '/*.parquet', 'table_name': d.stem}
                 logger.info(f'Using {env} to build {env["output_dataset_path"]}')
-                # Evidence table is a special case, since it is hive partitioned table.
-                if d.stem == 'evidence':
+                try:
+                    statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
+                    db.execute(statements)
+                except Exception as e:
+                    logger.warning(f'Failed to create table for {d.stem} with error: {e}')
+                    logger.info('Attempting hive partitioned table creation')
                     env['output_dataset_path'] = str(d) + '/*/*.parquet'
                     statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_HIVE_TABLE).unwrap()
-                else:
-                    statements = QueryResolver(env=env).get(SeqquratQueryName.CREATE_OT_TABLE).unwrap()
-                db.execute(statements)
+                    db.execute(statements)
             if view:
                 for v in view:
                     if v == View.THERAPEUTIC_AREAS:

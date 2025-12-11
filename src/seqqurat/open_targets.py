@@ -40,6 +40,7 @@ class OpenTargetsDatasetSchemaRegistry:
         '25.06': BASE_SCHEMA_PATH / '25.06' / 'release.yaml',
         '25.09': BASE_SCHEMA_PATH / '25.09' / 'release.yaml',
         '25.12': BASE_SCHEMA_PATH / '25.12' / 'release.yaml',
+        '25.12-ppp': BASE_SCHEMA_PATH / '25.12-ppp' / 'release.yaml',
     }
 
     SCHEMA = {r: OpenTargetsDatasetModel.from_path(p) for r, p in SCHEMA_PATHS.items()}
