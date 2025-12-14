@@ -72,3 +72,4 @@ class SeqquratQueryName(StrEnum):
     CREATE_OT_TABLE = 'create_ot_table'
     CREATE_OT_HIVE_TABLE = 'create_ot_hive_table'
     THERAPEUTIC_AREAS = 'therapeutic_areas'
+    COLOCALISATION_STATS = 'colocalisation_stats'

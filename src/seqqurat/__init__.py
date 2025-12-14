@@ -18,7 +18,7 @@ class View(StrEnum):
     """Enum for different queries."""
 
     THERAPEUTIC_AREAS = 'therapeutic_areas'
-    OTHER = 'other'
+    COLOCALISATION_STATS = 'colocalisation_stats'
 
 
 DB_FILE = Path('gwas.db')
@@ -126,12 +126,16 @@ def build_ot_db(
                     db.execute(statements)
             if view:
                 for v in view:
-                    if v == View.THERAPEUTIC_AREAS:
-                        logger.info('Adding therapeutic areas view.')
-                        statements = QueryResolver().get(SeqquratQueryName.THERAPEUTIC_AREAS).unwrap()
-                        db.execute(statements)
+                    match v:
+                        case View.THERAPEUTIC_AREAS:
+                            logger.info('Adding therapeutic areas view.')
+                            statements = QueryResolver().get(SeqquratQueryName.THERAPEUTIC_AREAS).unwrap()
+                            db.execute(statements)
+                        case View.COLOCALISATION_STATS:
+                            logger.info('Adding colocalisation stats views.')
+                            statements = QueryResolver().get(SeqquratQueryName.COLOCALISATION_STATS).unwrap()
+                            db.execute(statements)
 
         case _:
             logger.debug('No valid OpenTargets dataset structure found.')
-
             sys.exit(1)
