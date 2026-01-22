@@ -67,9 +67,14 @@ class QueryResolver:
 class SeqquratQueryName(StrEnum):
     """In-house query names defined for the seqqurat package."""
 
+    # Tables
     CREATE_STUDY_TABLE = 'create_study_table'
     EXTRACT_SEQWAS = 'extract_seqwas'
     CREATE_OT_TABLE = 'create_ot_table'
     CREATE_OT_HIVE_TABLE = 'create_ot_hive_table'
+
+    # Views
     THERAPEUTIC_AREAS = 'therapeutic_areas'
     COLOCALISATION_STATS = 'colocalisation_stats'
+    TRANS_ENHANCERS = 'trans_enhancers'
+    VARIANT_MAF = 'variant_maf'

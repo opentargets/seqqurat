@@ -4,7 +4,7 @@
 -- Question: What if there is no alleleFrequency ? - fallback to 0.0
 /*  Macro to extract the major population from the study table ldPopulationStructure field
  *  This macro will extract the population that has the highest relativeSampleSize
- *  In case multiple populations have the same sample size (highly unprobable) function 
+ *  In case multiple populations have the same sample size (highly improbable) function 
  *  chooses the population that is specified by the `defaultMajorPopulationName` parameter
  *  In case the ldPopulationStructure is empty, the table will return Null.
  * Args:
