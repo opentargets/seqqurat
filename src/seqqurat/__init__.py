@@ -22,6 +22,8 @@ class View(StrEnum):
     TRANS_ENHANCERS = 'trans_enhancers'
     OTHER = 'other'
     VARIANT_MAF = 'variant_maf'
+    STUDY_STATS = 'study_stats'
+    CREDIBLE_SET_STATS = 'credible_set_stats'
 
 
 DB_FILE = Path('gwas.db')
@@ -145,9 +147,16 @@ def build_ot_db(
                             logger.info('Adding variant MAF view.')
                             statements = QueryResolver().get(SeqquratQueryName.VARIANT_MAF).unwrap()
                             db.execute(statements)
+                        case View.STUDY_STATS:
+                            logger.info('Adding colocalisation stats views.')
+                            statements = QueryResolver().get(SeqquratQueryName.STUDY_STATS).unwrap()
+                            db.execute(statements)
+                        case View.CREDIBLE_SET_STATS:
+                            logger.info('Adding colocalisation stats views.')
+                            statements = QueryResolver().get(SeqquratQueryName.CREDIBLE_SET_STATS).unwrap()
+                            db.execute(statements)
                         case _:
                             logger.warning(f'View {v} not recognised, skipping.')
-
         case _:
             logger.debug('No valid OpenTargets dataset structure found.')
             sys.exit(1)

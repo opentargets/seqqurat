@@ -78,3 +78,5 @@ class SeqquratQueryName(StrEnum):
     COLOCALISATION_STATS = 'colocalisation_stats'
     TRANS_ENHANCERS = 'trans_enhancers'
     VARIANT_MAF = 'variant_maf'
+    STUDY_STATS = 'study_stats'
+    CREDIBLE_SET_STATS = 'credible_set_stats'
