@@ -101,17 +101,20 @@ def build_ot_db(
     ] = OT_DB_FILE,
     release: Annotated[str, typer.Option(help='OpenTargets release version to validate against.')] | None = None,
     view: Annotated[list[View] | None, typer.Option(help='Views to include in the database.')] = None,
+    subset: Annotated[bool, typer.Option(help='Load only available datasets, skipping any that are missing.')] = False,
     dry_run: Annotated[bool, typer.Option(help='If set, will not build the database.')] = False,
 ):
     """Build OpenTargets duckdb database."""
     logger.info('Extracting information from output dataset.')
     if view:
         logger.info(f'Including views: {view}')
+    if subset:
+        logger.info('Subset mode: loading only available datasets.')
     if dry_run:
         logger.info('Dry run set, exiting now.')
         sys.exit(0)
     schema_registry = OpenTargetsDatasetSchemaRegistry(directory=output_datasets_path)
-    model = schema_registry.validate(release=release)
+    model = schema_registry.validate(release=release, strict=not subset)
     match model:
         case Success(_model):
             db = GWASCatalogStudyStore.build(location=db_path)

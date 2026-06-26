@@ -44,6 +44,7 @@ class OpenTargetsDatasetSchemaRegistry:
         '26.03': BASE_SCHEMA_PATH / '26.03' / 'release.yaml',
         '26.03-ppp': BASE_SCHEMA_PATH / '26.03-ppp' / 'release.yaml',
         '26.06': BASE_SCHEMA_PATH / '26.06' / 'release.yaml',
+        '26.06-ppp': BASE_SCHEMA_PATH / '26.06-ppp' / 'release.yaml',
     }
 
     SCHEMA = {r: OpenTargetsDatasetModel.from_path(p) for r, p in SCHEMA_PATHS.items()}
@@ -51,7 +52,9 @@ class OpenTargetsDatasetSchemaRegistry:
     def __init__(self, directory: Path) -> None:
         self.directory = directory
 
-    def validate(self, release: str | None = None) -> Result[OpenTargetsDatasetModel, SeqquratError]:
+    def validate(
+        self, release: str | None = None, strict: bool = True
+    ) -> Result[OpenTargetsDatasetModel, SeqquratError]:
         """Validate if the subdirectories exist in the parent dir.
 
         The logic behind validation is as follows:
@@ -60,6 +63,8 @@ class OpenTargetsDatasetSchemaRegistry:
         (2) if no release is provided, iterate over all known release schemas
             and validate against each one until a match is found. If no match is found,
             return an error.
+
+        When strict=False, missing datasets are skipped rather than causing failure.
         """
         if release:
             loguru.logger.info(f'Validating against specified release schema: {release}')
@@ -69,12 +74,15 @@ class OpenTargetsDatasetSchemaRegistry:
                 return Failure(SeqquratError.MISSING_RELEASE_SCHEMA)
             _expected_dirs = {self.directory / d for d in model.datasets}
             _asserted_paths = set(self.directory.iterdir())
-            if not _expected_dirs.issubset(_asserted_paths):
+            missing = _expected_dirs - _asserted_paths
+            if missing and strict:
                 loguru.logger.error(f'Validation failed for release: {release}')
-                missing = _expected_dirs - _asserted_paths
                 loguru.logger.error(f'Missing directories: {missing}')
                 return Failure(SeqquratError.OUTPUT_DIR_VALIDATION_ERROR)
-            return Success(OpenTargetsDatasetModel(release=release, datasets=list(_expected_dirs)))
+            if missing:
+                loguru.logger.warning(f'Skipping missing directories: {missing}')
+            available = list(_expected_dirs - missing)
+            return Success(OpenTargetsDatasetModel(release=release, datasets=available))
 
         found_model = None
         for r, model in self.SCHEMA.items():
@@ -82,11 +90,16 @@ class OpenTargetsDatasetSchemaRegistry:
             _expected_dirs = {self.directory / d for d in model.datasets}
             _asserted_paths = set(self.directory.iterdir())
             if not _expected_dirs.issubset(_asserted_paths):
+                if not strict:
+                    available = list(_expected_dirs & _asserted_paths)
+                    if available:
+                        found_model = OpenTargetsDatasetModel(release=r, datasets=available)
+                        loguru.logger.info(f'Partial match for release: {r}, loading {len(available)} datasets.')
+                        break
                 loguru.logger.info(f'Validation failed for release: {r}')
                 missing = _expected_dirs - _asserted_paths
                 loguru.logger.info(f'Missing directories: {missing}')
                 continue
-            found_model = model
             found_model = OpenTargetsDatasetModel(release=r, datasets=list(_expected_dirs))
             loguru.logger.info(f'Validation succeeded for release: {r}')
             break

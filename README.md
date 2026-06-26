@@ -46,6 +46,14 @@ Now you can explore the Open Targets output data in your browser SQL client!
 - 25.06
 - 25.09
 - 25.12
+- 26.03
+- 26-06
+
+
+### Loading partial
+
+To load just a subset of the Open Targets outputs you can use the `--subset` option. This will load only the datasets that exist in the provided folder rather then expecting all datasets to be present. Note that this might break the `--view` queries if the required datasets are not present.
+
 
 
 ### Exome sequencing analysis
