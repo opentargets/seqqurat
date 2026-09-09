@@ -47,7 +47,7 @@ OR REPLACE VIEW therapeutic_areas_lut AS (
 /* 
  * View to link studies to therapeutic areas
  */
-CREATE VIEW study_per_therapeutic_area AS (
+CREATE OR REPLACE VIEW study_per_therapeutic_area AS (
     WITH si AS (
         SELECT
             study.studyId AS studyId,
